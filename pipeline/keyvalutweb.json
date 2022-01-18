@@ -1,0 +1,94 @@
+{
+	"name": "keyvalutweb",
+	"properties": {
+		"activities": [
+			{
+				"name": "Webusername",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://keyvalutpublic.vault.azure.net/secrets/apiusername/6af567ccb160482c8d279cd9b0d64b43?api-version=7.0",
+					"method": "GET",
+					"disableCertValidation": false,
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Webuserpassword",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://keyvalutpublic.vault.azure.net/secrets/apipassword/b7f7dbedbda94f70886454722ba84b9b?api-version=7.0",
+					"method": "GET",
+					"disableCertValidation": false,
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Webusername",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Webuserpassword",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://github.com/Mmodarre/AzureDataFactoryHOL/blob/master/Lab-guide/03-Copy_Activity_Parameters_Debug_and_Publishing/README.md",
+					"method": "POST",
+					"body": {
+						"value": "\njson(concat('{\"username\":\"',activity('Webusername').output.value,'\",\"password\":\"',activity('Webuserpassword').output.value,'\"'))",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "ServicePrincipal",
+						"userTenant": "3cfd0e2d-fe77-45dc-8f9f-9516e34cfe4b",
+						"password": {
+							"type": "SecureString",
+							"value": "**********"
+						}
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
